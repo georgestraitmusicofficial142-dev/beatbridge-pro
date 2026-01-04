@@ -1,0 +1,505 @@
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
+
+export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.1"
+  }
+  public: {
+    Tables: {
+      beat_purchases: {
+        Row: {
+          beat_id: string
+          buyer_id: string
+          id: string
+          license_type: Database["public"]["Enums"]["license_type"]
+          price_paid: number
+          purchased_at: string
+        }
+        Insert: {
+          beat_id: string
+          buyer_id: string
+          id?: string
+          license_type: Database["public"]["Enums"]["license_type"]
+          price_paid: number
+          purchased_at?: string
+        }
+        Update: {
+          beat_id?: string
+          buyer_id?: string
+          id?: string
+          license_type?: Database["public"]["Enums"]["license_type"]
+          price_paid?: number
+          purchased_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beat_purchases_beat_id_fkey"
+            columns: ["beat_id"]
+            isOneToOne: false
+            referencedRelation: "beats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      beats: {
+        Row: {
+          audio_url: string
+          bpm: number
+          cover_url: string | null
+          created_at: string
+          description: string | null
+          genre: Database["public"]["Enums"]["beat_genre"]
+          id: string
+          is_sold_exclusive: boolean | null
+          key: string | null
+          mood: Database["public"]["Enums"]["beat_mood"]
+          play_count: number | null
+          price_basic: number
+          price_exclusive: number
+          price_premium: number
+          producer_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          audio_url: string
+          bpm: number
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          genre: Database["public"]["Enums"]["beat_genre"]
+          id?: string
+          is_sold_exclusive?: boolean | null
+          key?: string | null
+          mood: Database["public"]["Enums"]["beat_mood"]
+          play_count?: number | null
+          price_basic?: number
+          price_exclusive?: number
+          price_premium?: number
+          producer_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          audio_url?: string
+          bpm?: number
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          genre?: Database["public"]["Enums"]["beat_genre"]
+          id?: string
+          is_sold_exclusive?: boolean | null
+          key?: string | null
+          mood?: Database["public"]["Enums"]["beat_mood"]
+          play_count?: number | null
+          price_basic?: number
+          price_exclusive?: number
+          price_premium?: number
+          producer_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      bookings: {
+        Row: {
+          client_id: string
+          created_at: string
+          duration_hours: number
+          id: string
+          notes: string | null
+          producer_id: string | null
+          session_date: string
+          session_type: Database["public"]["Enums"]["session_type"]
+          start_time: string
+          status: Database["public"]["Enums"]["booking_status"]
+          total_price: number | null
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          duration_hours?: number
+          id?: string
+          notes?: string | null
+          producer_id?: string | null
+          session_date: string
+          session_type: Database["public"]["Enums"]["session_type"]
+          start_time: string
+          status?: Database["public"]["Enums"]["booking_status"]
+          total_price?: number | null
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          duration_hours?: number
+          id?: string
+          notes?: string | null
+          producer_id?: string | null
+          session_date?: string
+          session_type?: Database["public"]["Enums"]["session_type"]
+          start_time?: string
+          status?: Database["public"]["Enums"]["booking_status"]
+          total_price?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      project_files: {
+        Row: {
+          created_at: string
+          file_name: string
+          file_size: number | null
+          file_type: string | null
+          file_url: string
+          id: string
+          project_id: string
+          uploaded_by: string
+          version: number | null
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          file_size?: number | null
+          file_type?: string | null
+          file_url: string
+          id?: string
+          project_id: string
+          uploaded_by: string
+          version?: number | null
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          file_size?: number | null
+          file_type?: string | null
+          file_url?: string
+          id?: string
+          project_id?: string
+          uploaded_by?: string
+          version?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_files_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
+        Row: {
+          budget: number | null
+          client_id: string
+          created_at: string
+          deadline: string | null
+          description: string | null
+          id: string
+          producer_id: string | null
+          status: Database["public"]["Enums"]["project_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          budget?: number | null
+          client_id: string
+          created_at?: string
+          deadline?: string | null
+          description?: string | null
+          id?: string
+          producer_id?: string | null
+          status?: Database["public"]["Enums"]["project_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          budget?: number | null
+          client_id?: string
+          created_at?: string
+          deadline?: string | null
+          description?: string | null
+          id?: string
+          producer_id?: string | null
+          status?: Database["public"]["Enums"]["project_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+    }
+    Enums: {
+      app_role: "artist" | "producer" | "admin"
+      beat_genre:
+        | "hip_hop"
+        | "rnb"
+        | "pop"
+        | "electronic"
+        | "trap"
+        | "jazz"
+        | "rock"
+        | "ambient"
+        | "afrobeats"
+        | "latin"
+      beat_mood:
+        | "energetic"
+        | "chill"
+        | "dark"
+        | "uplifting"
+        | "romantic"
+        | "aggressive"
+        | "melancholic"
+        | "happy"
+      booking_status: "pending" | "confirmed" | "completed" | "cancelled"
+      license_type: "basic" | "premium" | "exclusive"
+      project_status:
+        | "draft"
+        | "in_progress"
+        | "review"
+        | "completed"
+        | "archived"
+      session_type:
+        | "recording"
+        | "mixing"
+        | "mastering"
+        | "production"
+        | "consultation"
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+}
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {
+      app_role: ["artist", "producer", "admin"],
+      beat_genre: [
+        "hip_hop",
+        "rnb",
+        "pop",
+        "electronic",
+        "trap",
+        "jazz",
+        "rock",
+        "ambient",
+        "afrobeats",
+        "latin",
+      ],
+      beat_mood: [
+        "energetic",
+        "chill",
+        "dark",
+        "uplifting",
+        "romantic",
+        "aggressive",
+        "melancholic",
+        "happy",
+      ],
+      booking_status: ["pending", "confirmed", "completed", "cancelled"],
+      license_type: ["basic", "premium", "exclusive"],
+      project_status: [
+        "draft",
+        "in_progress",
+        "review",
+        "completed",
+        "archived",
+      ],
+      session_type: [
+        "recording",
+        "mixing",
+        "mastering",
+        "production",
+        "consultation",
+      ],
+    },
+  },
+} as const

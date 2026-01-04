@@ -1,18 +1,21 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Headphones } from "lucide-react";
+import { Menu, X, Headphones, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navLinks = [
-  { label: "Home", href: "#" },
-  { label: "Services", href: "#services" },
-  { label: "Studio", href: "#studio" },
-  { label: "Beats", href: "#beats" },
-  { label: "Artists", href: "#artists" },
+  { label: "Home", href: "/" },
+  { label: "Services", href: "/#services" },
+  { label: "Beats", href: "/beats" },
+  { label: "Book Session", href: "/booking" },
 ];
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <motion.nav
@@ -24,47 +27,61 @@ export const Navbar = () => {
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <motion.a
-            href="#"
+          <Link
+            to="/"
             className="flex items-center gap-3 group"
-            whileHover={{ scale: 1.02 }}
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20">
+            <motion.div 
+              whileHover={{ scale: 1.05 }}
+              className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20"
+            >
               <Headphones className="w-5 h-5 text-primary-foreground" />
-            </div>
+            </motion.div>
             <div className="flex flex-col">
               <span className="font-display font-bold text-lg text-foreground leading-tight">
                 WE Global
               </span>
               <span className="text-xs text-muted-foreground">Music Studio</span>
             </div>
-          </motion.a>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-8">
             {navLinks.map((link, index) => (
-              <motion.a
+              <motion.div
                 key={link.label}
-                href={link.href}
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-300 group"
               >
-                {link.label}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-accent group-hover:w-full transition-all duration-300" />
-              </motion.a>
+                <Link
+                  to={link.href}
+                  className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-300 group"
+                >
+                  {link.label}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-accent group-hover:w-full transition-all duration-300" />
+                </Link>
+              </motion.div>
             ))}
           </div>
 
           {/* CTA Buttons */}
           <div className="hidden lg:flex items-center gap-4">
-            <Button variant="ghost" size="sm">
-              Sign In
-            </Button>
-            <Button variant="hero" size="sm">
-              Book Session
-            </Button>
+            {user ? (
+              <Button variant="hero" size="sm" onClick={() => navigate("/dashboard")}>
+                <User className="w-4 h-4 mr-2" />
+                Dashboard
+              </Button>
+            ) : (
+              <>
+                <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
+                  Sign In
+                </Button>
+                <Button variant="hero" size="sm" onClick={() => navigate("/booking")}>
+                  Book Session
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -88,22 +105,31 @@ export const Navbar = () => {
           >
             <div className="container mx-auto px-6 py-6 space-y-4">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.label}
-                  href={link.href}
+                  to={link.href}
                   className="block text-lg font-medium text-muted-foreground hover:text-foreground transition-colors"
                   onClick={() => setIsOpen(false)}
                 >
                   {link.label}
-                </a>
+                </Link>
               ))}
               <div className="pt-4 flex flex-col gap-3">
-                <Button variant="ghost" className="w-full justify-center">
-                  Sign In
-                </Button>
-                <Button variant="hero" className="w-full justify-center">
-                  Book Session
-                </Button>
+                {user ? (
+                  <Button variant="hero" className="w-full justify-center" onClick={() => { navigate("/dashboard"); setIsOpen(false); }}>
+                    <User className="w-4 h-4 mr-2" />
+                    Dashboard
+                  </Button>
+                ) : (
+                  <>
+                    <Button variant="ghost" className="w-full justify-center" onClick={() => { navigate("/auth"); setIsOpen(false); }}>
+                      Sign In
+                    </Button>
+                    <Button variant="hero" className="w-full justify-center" onClick={() => { navigate("/booking"); setIsOpen(false); }}>
+                      Book Session
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>
