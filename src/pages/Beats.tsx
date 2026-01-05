@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Play, Pause, Filter, Search, ShoppingCart, Music2, Clock, Zap } from "lucide-react";
+import { Play, Pause, Filter, Search, ShoppingCart, Music2, Zap } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AudioPlayer } from "@/components/audio/AudioPlayer";
 
 // Sample beat data (in production, this would come from the database)
 const sampleBeats = [
@@ -387,6 +388,30 @@ const Beats = () => {
             </div>
           )}
         </div>
+
+        {/* Global Audio Player */}
+        {playingBeatId && (
+          <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-background/80 backdrop-blur-xl border-t border-border/50">
+            <div className="container mx-auto">
+              <AudioPlayer
+                title={sampleBeats.find(b => b.id === playingBeatId)?.title || "Unknown"}
+                artist={sampleBeats.find(b => b.id === playingBeatId)?.producer || "Unknown"}
+                coverUrl={sampleBeats.find(b => b.id === playingBeatId)?.cover_url}
+                compact
+                onNext={() => {
+                  const currentIndex = sampleBeats.findIndex(b => b.id === playingBeatId);
+                  const nextBeat = sampleBeats[currentIndex + 1];
+                  if (nextBeat) setPlayingBeatId(nextBeat.id);
+                }}
+                onPrevious={() => {
+                  const currentIndex = sampleBeats.findIndex(b => b.id === playingBeatId);
+                  const prevBeat = sampleBeats[currentIndex - 1];
+                  if (prevBeat) setPlayingBeatId(prevBeat.id);
+                }}
+              />
+            </div>
+          </div>
+        )}
       </main>
 
       <Footer />
