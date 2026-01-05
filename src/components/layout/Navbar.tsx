@@ -1,42 +1,68 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Headphones, User } from "lucide-react";
+import { Menu, X, Headphones, User, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const navLinks = [
   { label: "Home", href: "/" },
   { label: "Studio", href: "/studio" },
-  { label: "Services", href: "/#services" },
+  { label: "Services", href: "/services" },
   { label: "Beats", href: "/beats" },
   { label: "Book Session", href: "/booking" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      if (!user) { setIsAdmin(false); return; }
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      setIsAdmin(data?.role === "admin" || data?.role === "producer");
+    };
+    checkAdmin();
+  }, [user]);
 
   return (
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="fixed top-0 left-0 right-0 z-50 glass"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled ? "glass shadow-lg shadow-black/10" : "bg-transparent"
+      }`}
     >
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link
-            to="/"
-            className="flex items-center gap-3 group"
-          >
+          <Link to="/" className="flex items-center gap-3 group">
             <motion.div 
-              whileHover={{ scale: 1.05 }}
-              className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20"
+              whileHover={{ scale: 1.05, rotate: 5 }}
+              className="relative"
             >
-              <Headphones className="w-5 h-5 text-primary-foreground" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-xl blur-md opacity-50 group-hover:opacity-80 transition-opacity" />
+              <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                <Headphones className="w-5 h-5 text-primary-foreground" />
+              </div>
             </motion.div>
             <div className="flex flex-col">
               <span className="font-display font-bold text-lg text-foreground leading-tight">
@@ -47,32 +73,47 @@ export const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-8">
-            {navLinks.map((link, index) => (
-              <motion.div
-                key={link.label}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Link
-                  to={link.href}
-                  className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-300 group"
+          <div className="hidden lg:flex items-center gap-6">
+            {navLinks.map((link, index) => {
+              const isActive = location.pathname === link.href;
+              return (
+                <motion.div
+                  key={link.label}
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
                 >
-                  {link.label}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-accent group-hover:w-full transition-all duration-300" />
-                </Link>
-              </motion.div>
-            ))}
+                  <Link
+                    to={link.href}
+                    className={`relative text-sm font-medium transition-colors duration-300 group ${
+                      isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {link.label}
+                    <span className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-primary to-accent transition-all duration-300 ${
+                      isActive ? "w-full" : "w-0 group-hover:w-full"
+                    }`} />
+                  </Link>
+                </motion.div>
+              );
+            })}
           </div>
 
           {/* CTA Buttons */}
-          <div className="hidden lg:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-3">
             {user ? (
-              <Button variant="hero" size="sm" onClick={() => navigate("/dashboard")}>
-                <User className="w-4 h-4 mr-2" />
-                Dashboard
-              </Button>
+              <>
+                {isAdmin && (
+                  <Button variant="ghost" size="sm" onClick={() => navigate("/admin")}>
+                    <Shield className="w-4 h-4 mr-2" />
+                    Admin
+                  </Button>
+                )}
+                <Button variant="hero" size="sm" onClick={() => navigate("/dashboard")}>
+                  <User className="w-4 h-4 mr-2" />
+                  Dashboard
+                </Button>
+              </>
             ) : (
               <>
                 <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
@@ -86,12 +127,13 @@ export const Navbar = () => {
           </div>
 
           {/* Mobile Menu Toggle */}
-          <button
+          <motion.button
             onClick={() => setIsOpen(!isOpen)}
             className="lg:hidden p-2 text-foreground"
+            whileTap={{ scale: 0.9 }}
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          </motion.button>
         </div>
       </div>
 
@@ -109,7 +151,9 @@ export const Navbar = () => {
                 <Link
                   key={link.label}
                   to={link.href}
-                  className="block text-lg font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  className={`block text-lg font-medium transition-colors ${
+                    location.pathname === link.href ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                  }`}
                   onClick={() => setIsOpen(false)}
                 >
                   {link.label}
@@ -117,10 +161,18 @@ export const Navbar = () => {
               ))}
               <div className="pt-4 flex flex-col gap-3">
                 {user ? (
-                  <Button variant="hero" className="w-full justify-center" onClick={() => { navigate("/dashboard"); setIsOpen(false); }}>
-                    <User className="w-4 h-4 mr-2" />
-                    Dashboard
-                  </Button>
+                  <>
+                    {isAdmin && (
+                      <Button variant="outline" className="w-full justify-center" onClick={() => { navigate("/admin"); setIsOpen(false); }}>
+                        <Shield className="w-4 h-4 mr-2" />
+                        Admin Panel
+                      </Button>
+                    )}
+                    <Button variant="hero" className="w-full justify-center" onClick={() => { navigate("/dashboard"); setIsOpen(false); }}>
+                      <User className="w-4 h-4 mr-2" />
+                      Dashboard
+                    </Button>
+                  </>
                 ) : (
                   <>
                     <Button variant="ghost" className="w-full justify-center" onClick={() => { navigate("/auth"); setIsOpen(false); }}>
