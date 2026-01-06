@@ -58,6 +58,7 @@ export type Database = {
           description: string | null
           genre: Database["public"]["Enums"]["beat_genre"]
           id: string
+          is_sample: boolean | null
           is_sold_exclusive: boolean | null
           key: string | null
           mood: Database["public"]["Enums"]["beat_mood"]
@@ -65,7 +66,7 @@ export type Database = {
           price_basic: number
           price_exclusive: number
           price_premium: number
-          producer_id: string
+          producer_id: string | null
           title: string
           updated_at: string
         }
@@ -77,6 +78,7 @@ export type Database = {
           description?: string | null
           genre: Database["public"]["Enums"]["beat_genre"]
           id?: string
+          is_sample?: boolean | null
           is_sold_exclusive?: boolean | null
           key?: string | null
           mood: Database["public"]["Enums"]["beat_mood"]
@@ -84,7 +86,7 @@ export type Database = {
           price_basic?: number
           price_exclusive?: number
           price_premium?: number
-          producer_id: string
+          producer_id?: string | null
           title: string
           updated_at?: string
         }
@@ -96,6 +98,7 @@ export type Database = {
           description?: string | null
           genre?: Database["public"]["Enums"]["beat_genre"]
           id?: string
+          is_sample?: boolean | null
           is_sold_exclusive?: boolean | null
           key?: string | null
           mood?: Database["public"]["Enums"]["beat_mood"]
@@ -103,7 +106,7 @@ export type Database = {
           price_basic?: number
           price_exclusive?: number
           price_premium?: number
-          producer_id?: string
+          producer_id?: string | null
           title?: string
           updated_at?: string
         }
@@ -157,29 +160,41 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          badge: string | null
           bio: string | null
+          client_type: string | null
+          country: string | null
           created_at: string
           email: string | null
           full_name: string | null
           id: string
+          region: string | null
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
+          badge?: string | null
           bio?: string | null
+          client_type?: string | null
+          country?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
           id: string
+          region?: string | null
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
+          badge?: string | null
           bio?: string | null
+          client_type?: string | null
+          country?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
           id?: string
+          region?: string | null
           updated_at?: string
         }
         Relationships: []
