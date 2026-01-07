@@ -157,6 +157,99 @@ export type Database = {
         }
         Relationships: []
       }
+      payments: {
+        Row: {
+          amount: number
+          checkout_request_id: string | null
+          created_at: string | null
+          currency: string | null
+          id: string
+          merchant_request_id: string | null
+          metadata: Json | null
+          mpesa_receipt_number: string | null
+          payment_method: string | null
+          payment_type: string
+          phone_number: string | null
+          reference_id: string | null
+          result_code: string | null
+          result_desc: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          checkout_request_id?: string | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          merchant_request_id?: string | null
+          metadata?: Json | null
+          mpesa_receipt_number?: string | null
+          payment_method?: string | null
+          payment_type: string
+          phone_number?: string | null
+          reference_id?: string | null
+          result_code?: string | null
+          result_desc?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          checkout_request_id?: string | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          merchant_request_id?: string | null
+          metadata?: Json | null
+          mpesa_receipt_number?: string | null
+          payment_method?: string | null
+          payment_type?: string
+          phone_number?: string | null
+          reference_id?: string | null
+          result_code?: string | null
+          result_desc?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      platform_settings: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_sensitive: boolean | null
+          setting_key: string
+          setting_type: string
+          setting_value: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_sensitive?: boolean | null
+          setting_key: string
+          setting_type?: string
+          setting_value?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_sensitive?: boolean | null
+          setting_key?: string
+          setting_type?: string
+          setting_value?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
