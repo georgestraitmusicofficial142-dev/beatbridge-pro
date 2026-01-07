@@ -20,7 +20,8 @@ import {
   Upload,
   Image,
   Save,
-  X
+  X,
+  CreditCard
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +33,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
+import { SettingsPanel } from "@/components/admin/SettingsPanel";
+import { PaymentsPanel } from "@/components/admin/PaymentsPanel";
+import { UsersPanel } from "@/components/admin/UsersPanel";
 
 interface Beat {
   id: string;
@@ -288,6 +292,7 @@ const Admin = () => {
     { id: "overview", label: "Overview", icon: LayoutDashboard },
     { id: "beats", label: "Beats CMS", icon: Music },
     { id: "bookings", label: "Bookings", icon: Calendar },
+    { id: "payments", label: "Payments", icon: CreditCard },
     { id: "users", label: "Users", icon: Users },
     { id: "analytics", label: "Analytics", icon: BarChart3 },
     { id: "content", label: "Content", icon: FileText },
@@ -646,49 +651,11 @@ const Admin = () => {
             </motion.div>
           )}
 
+          {/* Payments Tab */}
+          {activeTab === "payments" && <PaymentsPanel />}
+
           {/* Users Tab */}
-          {activeTab === "users" && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-              <h2 className="font-display text-2xl font-semibold mb-6">User Management</h2>
-              
-              <div className="rounded-xl border border-border/50 overflow-hidden">
-                <table className="w-full">
-                  <thead className="bg-secondary/50">
-                    <tr>
-                      <th className="text-left p-4 font-medium text-muted-foreground">Name</th>
-                      <th className="text-left p-4 font-medium text-muted-foreground">Email</th>
-                      <th className="text-left p-4 font-medium text-muted-foreground">Joined</th>
-                      <th className="text-right p-4 font-medium text-muted-foreground">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {users.map((u) => (
-                      <tr key={u.id} className="border-t border-border/50 hover:bg-secondary/30">
-                        <td className="p-4 font-medium">{u.full_name || "—"}</td>
-                        <td className="p-4">{u.email || "—"}</td>
-                        <td className="p-4">{format(new Date(u.created_at), "MMM d, yyyy")}</td>
-                        <td className="p-4">
-                          <div className="flex items-center justify-end gap-2">
-                            <Button size="sm" variant="ghost">
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                            <Button size="sm" variant="ghost">
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                {users.length === 0 && (
-                  <div className="p-12 text-center text-muted-foreground">
-                    No users yet.
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          )}
+          {activeTab === "users" && <UsersPanel />}
 
           {/* Analytics Tab */}
           {activeTab === "analytics" && (
@@ -734,14 +701,7 @@ const Admin = () => {
           )}
 
           {/* Settings Tab */}
-          {activeTab === "settings" && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-              <h2 className="font-display text-2xl font-semibold mb-6">Settings</h2>
-              <div className="p-6 rounded-xl bg-card border border-border/50">
-                <p className="text-muted-foreground">Platform settings and configuration options will appear here.</p>
-              </div>
-            </motion.div>
-          )}
+          {activeTab === "settings" && <SettingsPanel />}
         </div>
       </main>
     </div>
