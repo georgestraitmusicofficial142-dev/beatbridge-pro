@@ -4,6 +4,8 @@ import { Play, Pause, ShoppingCart, Zap, Shield, Award, Globe } from "lucide-rea
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { MpesaCheckoutDialog } from "@/components/payments/MpesaCheckoutDialog";
+import { useCurrency } from "@/hooks/useCurrency";
 import type { Database } from "@/integrations/supabase/types";
 
 type Beat = Database["public"]["Tables"]["beats"]["Row"] & {
@@ -51,7 +53,9 @@ const getBadgeLabel = (badge: string | null) => {
 
 export const BeatCard = ({ beat, isPlaying, onPlay }: BeatCardProps) => {
   const [showLicenseDialog, setShowLicenseDialog] = useState(false);
-  
+  const [showMpesaDialog, setShowMpesaDialog] = useState(false);
+  const [selectedLicense, setSelectedLicense] = useState<{ type: string; price: number } | null>(null);
+  const { formatPrice } = useCurrency();
   // For sample beats (no producer), show WE Global as producer with global_staff badge
   const isSampleBeat = !beat.producer_id;
   const producerName = isSampleBeat ? "WE Global Studio" : (beat.producer?.full_name || "Unknown Producer");
@@ -149,7 +153,7 @@ export const BeatCard = ({ beat, isPlaying, onPlay }: BeatCardProps) => {
             <span>{(beat.play_count || 0).toLocaleString()} plays</span>
           </div>
           <span className="font-display font-bold text-lg text-foreground">
-            KES {Number(beat.price_basic).toLocaleString()}
+            {formatPrice(Number(beat.price_basic))}
           </span>
         </div>
 
@@ -170,13 +174,18 @@ export const BeatCard = ({ beat, isPlaying, onPlay }: BeatCardProps) => {
                 { type: "Premium", price: Number(beat.price_premium), features: ["WAV + MP3", "Unlimited streams", "Non-exclusive"] },
                 { type: "Exclusive", price: Number(beat.price_exclusive), features: ["All stems", "Unlimited use", "Full ownership"] },
               ].map((license) => (
-                <div
+                <button
                   key={license.type}
-                  className="p-4 rounded-xl border border-border hover:border-primary/50 transition-colors cursor-pointer"
+                  onClick={() => {
+                    setSelectedLicense(license);
+                    setShowLicenseDialog(false);
+                    setShowMpesaDialog(true);
+                  }}
+                  className="w-full p-4 rounded-xl border border-border hover:border-primary/50 transition-colors text-left"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-display font-semibold text-lg">{license.type}</span>
-                    <span className="font-display font-bold text-xl text-primary">KES {license.price.toLocaleString()}</span>
+                    <span className="font-display font-bold text-xl text-primary">{formatPrice(license.price)}</span>
                   </div>
                   <ul className="space-y-1">
                     {license.features.map((feature) => (
@@ -186,11 +195,27 @@ export const BeatCard = ({ beat, isPlaying, onPlay }: BeatCardProps) => {
                       </li>
                     ))}
                   </ul>
-                </div>
+                </button>
               ))}
             </div>
           </DialogContent>
         </Dialog>
+
+        {selectedLicense && (
+          <MpesaCheckoutDialog
+            open={showMpesaDialog}
+            onOpenChange={setShowMpesaDialog}
+            amount={selectedLicense.price}
+            description={`${beat.title} - ${selectedLicense.type} License`}
+            paymentType="beat_purchase"
+            referenceId={beat.id}
+            metadata={{ license_type: selectedLicense.type.toLowerCase(), beat_title: beat.title }}
+            onSuccess={() => {
+              setShowMpesaDialog(false);
+              setSelectedLicense(null);
+            }}
+          />
+        )}
       </div>
     </motion.div>
   );

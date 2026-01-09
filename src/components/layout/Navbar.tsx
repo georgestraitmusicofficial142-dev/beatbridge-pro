@@ -11,6 +11,7 @@ const navLinks = [
   { label: "Studio", href: "/studio" },
   { label: "Services", href: "/services" },
   { label: "Beats", href: "/beats" },
+  { label: "Library", href: "/library" },
   { label: "Book Session", href: "/booking" },
   { label: "Contact", href: "/contact" },
 ];
@@ -60,8 +61,8 @@ export const Navbar = () => {
               className="relative"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-xl blur-md opacity-50 group-hover:opacity-80 transition-opacity" />
-              <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <Headphones className="w-5 h-5 text-primary-foreground" />
+              <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center overflow-hidden">
+                <img src="/logo.png" alt="WE Global" className="w-8 h-8 object-contain" />
               </div>
             </motion.div>
             <div className="flex flex-col">
