@@ -13,13 +13,16 @@ import {
   TrendingUp,
   DollarSign,
   Users,
-  Headphones
+  Headphones,
+  ArrowLeftRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import { ArtistDashboard } from "@/components/dashboard/ArtistDashboard";
+import { ProducerDashboard } from "@/components/dashboard/ProducerDashboard";
 
 interface Profile {
   full_name: string | null;
@@ -51,6 +54,7 @@ const Dashboard = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
+  const [viewMode, setViewMode] = useState<"default" | "artist" | "producer">("default");
 
   useEffect(() => {
     if (!loading && !user) {
@@ -217,6 +221,15 @@ const Dashboard = () => {
               </p>
             </div>
             <div className="flex gap-3">
+              {userRole && (
+                <Button 
+                  variant="outline" 
+                  onClick={() => setViewMode(viewMode === "default" ? (userRole === "producer" ? "producer" : "artist") : "default")}
+                >
+                  <ArrowLeftRight className="w-4 h-4 mr-2" />
+                  {viewMode === "default" ? "Role View" : "Overview"}
+                </Button>
+              )}
               <Button variant="outline" onClick={() => navigate("/beats")}>
                 <Music className="w-4 h-4 mr-2" />
                 Browse Beats
@@ -228,9 +241,12 @@ const Dashboard = () => {
             </div>
           </div>
 
+          {/* Role-based Dashboard Views */}
+          {viewMode === "artist" && <ArtistDashboard />}
+          {viewMode === "producer" && <ProducerDashboard />}
+
           {/* Overview Tab */}
-          {activeTab === "overview" && (
-            <motion.div
+          {viewMode === "default" && activeTab === "overview" && (
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >

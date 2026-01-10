@@ -21,7 +21,8 @@ import {
   Image,
   Save,
   X,
-  CreditCard
+  CreditCard,
+  Rocket
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -36,6 +37,7 @@ import { useToast } from "@/hooks/use-toast";
 import { SettingsPanel } from "@/components/admin/SettingsPanel";
 import { PaymentsPanel } from "@/components/admin/PaymentsPanel";
 import { UsersPanel } from "@/components/admin/UsersPanel";
+import { OutreachPanel } from "@/components/admin/OutreachPanel";
 
 interface Beat {
   id: string;
@@ -294,6 +296,7 @@ const Admin = () => {
     { id: "bookings", label: "Bookings", icon: Calendar },
     { id: "payments", label: "Payments", icon: CreditCard },
     { id: "users", label: "Users", icon: Users },
+    { id: "outreach", label: "Outreach", icon: Rocket },
     { id: "analytics", label: "Analytics", icon: BarChart3 },
     { id: "content", label: "Content", icon: FileText },
     { id: "settings", label: "Settings", icon: Settings },
@@ -699,6 +702,9 @@ const Admin = () => {
               </div>
             </motion.div>
           )}
+
+          {/* Outreach Tab */}
+          {activeTab === "outreach" && <OutreachPanel />}
 
           {/* Settings Tab */}
           {activeTab === "settings" && <SettingsPanel />}
