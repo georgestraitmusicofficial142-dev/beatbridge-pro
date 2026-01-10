@@ -157,6 +157,125 @@ export type Database = {
         }
         Relationships: []
       }
+      outreach_applications: {
+        Row: {
+          admin_notes: string | null
+          applicant_email: string
+          applicant_id: string
+          applicant_name: string
+          bio: string | null
+          created_at: string
+          demo_url: string | null
+          experience_level: string
+          id: string
+          portfolio_url: string | null
+          program_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          social_links: Json | null
+          status: string
+          talent_type: string
+          why_apply: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          applicant_email: string
+          applicant_id: string
+          applicant_name: string
+          bio?: string | null
+          created_at?: string
+          demo_url?: string | null
+          experience_level: string
+          id?: string
+          portfolio_url?: string | null
+          program_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          social_links?: Json | null
+          status?: string
+          talent_type: string
+          why_apply?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          applicant_email?: string
+          applicant_id?: string
+          applicant_name?: string
+          bio?: string | null
+          created_at?: string
+          demo_url?: string | null
+          experience_level?: string
+          id?: string
+          portfolio_url?: string | null
+          program_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          social_links?: Json | null
+          status?: string
+          talent_type?: string
+          why_apply?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "outreach_applications_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "outreach_programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      outreach_programs: {
+        Row: {
+          benefits: Json | null
+          cover_image: string | null
+          created_at: string
+          current_participants: number | null
+          description: string | null
+          end_date: string | null
+          id: string
+          max_participants: number | null
+          program_type: string
+          requirements: Json | null
+          start_date: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          benefits?: Json | null
+          cover_image?: string | null
+          created_at?: string
+          current_participants?: number | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          max_participants?: number | null
+          program_type?: string
+          requirements?: Json | null
+          start_date?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          benefits?: Json | null
+          cover_image?: string | null
+          created_at?: string
+          current_participants?: number | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          max_participants?: number | null
+          program_type?: string
+          requirements?: Json | null
+          start_date?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number
