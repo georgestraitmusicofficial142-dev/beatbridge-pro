@@ -12,13 +12,16 @@ import {
   Plus,
   Eye,
   Download,
+  Wallet,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrency } from "@/hooks/useCurrency";
 import { BeatUploadDialog } from "@/components/beats/BeatUploadDialog";
+import { ProducerPayouts } from "@/components/dashboard/ProducerPayouts";
 
 interface ProducerDashboardProps {
   userId: string;
@@ -136,40 +139,53 @@ export const ProducerDashboard = ({ userId, profile }: ProducerDashboardProps) =
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-8"
+      className="space-y-6"
     >
-      {/* Stats */}
-      <div className="grid md:grid-cols-4 gap-6">
-        {[
-          { label: "Total Earnings", value: formatPrice(totalEarnings), icon: DollarSign, color: "primary" },
-          { label: "Total Sales", value: sales.length, icon: TrendingUp, color: "accent" },
-          { label: "Total Plays", value: totalPlays.toLocaleString(), icon: Play, color: "primary" },
-          { label: "Active Beats", value: beats.length, icon: Music, color: "accent" },
-        ].map((stat, i) => (
-          <div key={i} className="p-6 rounded-xl bg-card border border-border/50">
-            <div className="flex items-center justify-between mb-4">
-              <stat.icon className={`w-8 h-8 ${stat.color === "primary" ? "text-primary" : "text-accent"}`} />
-              <TrendingUp className="w-4 h-4 text-green-500" />
-            </div>
-            <p className="text-3xl font-display font-bold text-foreground">{stat.value}</p>
-            <p className="text-sm text-muted-foreground">{stat.label}</p>
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="mb-6">
+          <TabsTrigger value="overview">
+            <TrendingUp className="w-4 h-4 mr-2" />
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="payouts">
+            <Wallet className="w-4 h-4 mr-2" />
+            Payouts
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-8">
+          {/* Stats */}
+          <div className="grid md:grid-cols-4 gap-6">
+            {[
+              { label: "Total Earnings", value: formatPrice(totalEarnings), icon: DollarSign, color: "primary" },
+              { label: "Total Sales", value: sales.length, icon: TrendingUp, color: "accent" },
+              { label: "Total Plays", value: totalPlays.toLocaleString(), icon: Play, color: "primary" },
+              { label: "Active Beats", value: beats.length, icon: Music, color: "accent" },
+            ].map((stat, i) => (
+              <div key={i} className="p-6 rounded-xl bg-card border border-border/50">
+                <div className="flex items-center justify-between mb-4">
+                  <stat.icon className={`w-8 h-8 ${stat.color === "primary" ? "text-primary" : "text-accent"}`} />
+                  <TrendingUp className="w-4 h-4 text-green-500" />
+                </div>
+                <p className="text-3xl font-display font-bold text-foreground">{stat.value}</p>
+                <p className="text-sm text-muted-foreground">{stat.label}</p>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      {/* Quick Actions */}
-      <div className="flex gap-3">
-        <Button variant="hero" onClick={() => setShowUploadDialog(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          Upload New Beat
-        </Button>
-        <Button variant="outline" onClick={() => navigate("/beats")}>
-          <Eye className="w-4 h-4 mr-2" />
-          View Marketplace
-        </Button>
-      </div>
+          {/* Quick Actions */}
+          <div className="flex gap-3">
+            <Button variant="hero" onClick={() => setShowUploadDialog(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Upload New Beat
+            </Button>
+            <Button variant="outline" onClick={() => navigate("/beats")}>
+              <Eye className="w-4 h-4 mr-2" />
+              View Marketplace
+            </Button>
+          </div>
 
-      <div className="grid lg:grid-cols-2 gap-6">
+          <div className="grid lg:grid-cols-2 gap-6">
         {/* My Beats */}
         <div className="p-6 rounded-xl bg-card border border-border/50">
           <div className="flex items-center justify-between mb-6">
@@ -294,6 +310,12 @@ export const ProducerDashboard = ({ userId, profile }: ProducerDashboardProps) =
           </div>
         )}
       </div>
+        </TabsContent>
+
+        <TabsContent value="payouts">
+          <ProducerPayouts userId={userId} />
+        </TabsContent>
+      </Tabs>
 
       <BeatUploadDialog
         open={showUploadDialog}
