@@ -242,11 +242,16 @@ const Dashboard = () => {
           </div>
 
           {/* Role-based Dashboard Views */}
-          {viewMode === "artist" && <ArtistDashboard />}
-          {viewMode === "producer" && <ProducerDashboard />}
+          {viewMode === "artist" && user && (
+            <ArtistDashboard userId={user.id} profile={profile} />
+          )}
+          {viewMode === "producer" && user && (
+            <ProducerDashboard userId={user.id} profile={profile} />
+          )}
 
           {/* Overview Tab */}
           {viewMode === "default" && activeTab === "overview" && (
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
