@@ -15,6 +15,7 @@ const footerLinks = {
     { label: "About Us", href: "/studio" },
     { label: "Our Studio", href: "/studio" },
     { label: "Beats Store", href: "/beats" },
+    { label: "Outreach Programs", href: "/outreach" },
     { label: "Contact", href: "/contact" },
   ],
   legal: [

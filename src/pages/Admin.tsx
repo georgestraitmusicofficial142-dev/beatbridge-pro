@@ -22,7 +22,8 @@ import {
   Save,
   X,
   CreditCard,
-  Rocket
+  Rocket,
+  Wallet
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -38,6 +39,7 @@ import { SettingsPanel } from "@/components/admin/SettingsPanel";
 import { PaymentsPanel } from "@/components/admin/PaymentsPanel";
 import { UsersPanel } from "@/components/admin/UsersPanel";
 import { OutreachPanel } from "@/components/admin/OutreachPanel";
+import { PayoutsPanel } from "@/components/admin/PayoutsPanel";
 
 interface Beat {
   id: string;
@@ -295,6 +297,7 @@ const Admin = () => {
     { id: "beats", label: "Beats CMS", icon: Music },
     { id: "bookings", label: "Bookings", icon: Calendar },
     { id: "payments", label: "Payments", icon: CreditCard },
+    { id: "payouts", label: "Payouts", icon: Wallet },
     { id: "users", label: "Users", icon: Users },
     { id: "outreach", label: "Outreach", icon: Rocket },
     { id: "analytics", label: "Analytics", icon: BarChart3 },
@@ -656,6 +659,14 @@ const Admin = () => {
 
           {/* Payments Tab */}
           {activeTab === "payments" && <PaymentsPanel />}
+
+          {/* Payouts Tab */}
+          {activeTab === "payouts" && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+              <h2 className="font-display text-2xl font-semibold mb-6">Producer Payouts</h2>
+              <PayoutsPanel />
+            </motion.div>
+          )}
 
           {/* Users Tab */}
           {activeTab === "users" && <UsersPanel />}

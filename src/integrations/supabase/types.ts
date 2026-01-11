@@ -336,6 +336,57 @@ export type Database = {
         }
         Relationships: []
       }
+      payouts: {
+        Row: {
+          admin_notes: string | null
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          mpesa_receipt_number: string | null
+          payment_method: string
+          phone_number: string | null
+          processed_at: string | null
+          processed_by: string | null
+          producer_id: string
+          requested_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          amount: number
+          created_at?: string
+          currency?: string
+          id?: string
+          mpesa_receipt_number?: string | null
+          payment_method?: string
+          phone_number?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          producer_id: string
+          requested_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          mpesa_receipt_number?: string | null
+          payment_method?: string
+          phone_number?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          producer_id?: string
+          requested_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       platform_settings: {
         Row: {
           created_at: string | null
