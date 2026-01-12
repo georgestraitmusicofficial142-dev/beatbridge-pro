@@ -40,6 +40,7 @@ import { PaymentsPanel } from "@/components/admin/PaymentsPanel";
 import { UsersPanel } from "@/components/admin/UsersPanel";
 import { OutreachPanel } from "@/components/admin/OutreachPanel";
 import { PayoutsPanel } from "@/components/admin/PayoutsPanel";
+import { AnalyticsPanel } from "@/components/admin/AnalyticsPanel";
 
 interface Beat {
   id: string;
@@ -672,27 +673,7 @@ const Admin = () => {
           {activeTab === "users" && <UsersPanel />}
 
           {/* Analytics Tab */}
-          {activeTab === "analytics" && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-              <h2 className="font-display text-2xl font-semibold mb-6">Analytics</h2>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="p-6 rounded-xl bg-card border border-border/50">
-                  <h3 className="font-display text-lg font-semibold mb-4">Revenue Overview</h3>
-                  <div className="h-64 flex items-center justify-center text-muted-foreground">
-                    <BarChart3 className="w-12 h-12" />
-                    <span className="ml-4">Chart visualization coming soon</span>
-                  </div>
-                </div>
-                <div className="p-6 rounded-xl bg-card border border-border/50">
-                  <h3 className="font-display text-lg font-semibold mb-4">Booking Trends</h3>
-                  <div className="h-64 flex items-center justify-center text-muted-foreground">
-                    <TrendingUp className="w-12 h-12" />
-                    <span className="ml-4">Chart visualization coming soon</span>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
+          {activeTab === "analytics" && <AnalyticsPanel />}
 
           {/* Content Tab */}
           {activeTab === "content" && (
