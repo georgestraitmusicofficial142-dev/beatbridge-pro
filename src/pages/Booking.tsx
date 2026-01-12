@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { format, addDays, isSameDay, isAfter, startOfToday } from "date-fns";
-import { Calendar, Clock, User, ArrowRight, Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar, Clock, User, ArrowRight, Check, ChevronLeft, ChevronRight, Smartphone } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -10,13 +10,15 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { MpesaCheckoutDialog } from "@/components/payments/MpesaCheckoutDialog";
 
+// Session prices in KES
 const sessionTypes = [
   {
     id: "recording",
     name: "Recording Session",
     description: "Professional vocal and instrument recording",
-    price: 150,
+    priceKES: 15000,
     duration: 2,
     icon: "🎤",
   },
@@ -24,7 +26,7 @@ const sessionTypes = [
     id: "mixing",
     name: "Mixing Session",
     description: "Full mix with engineer consultation",
-    price: 200,
+    priceKES: 20000,
     duration: 3,
     icon: "🎚️",
   },
@@ -32,7 +34,7 @@ const sessionTypes = [
     id: "mastering",
     name: "Mastering",
     description: "Final polish for release-ready tracks",
-    price: 100,
+    priceKES: 10000,
     duration: 1,
     icon: "💿",
   },
@@ -40,7 +42,7 @@ const sessionTypes = [
     id: "production",
     name: "Production Session",
     description: "Collaborative beat-making and production",
-    price: 250,
+    priceKES: 25000,
     duration: 4,
     icon: "🎹",
   },
@@ -48,7 +50,7 @@ const sessionTypes = [
     id: "consultation",
     name: "Consultation",
     description: "One-on-one career and music advice",
-    price: 75,
+    priceKES: 7500,
     duration: 1,
     icon: "💬",
   },
@@ -73,12 +75,15 @@ const Booking = () => {
   const [notes, setNotes] = useState("");
   const [calendarWeekStart, setCalendarWeekStart] = useState(startOfToday());
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showMpesaDialog, setShowMpesaDialog] = useState(false);
+  const [createdBookingId, setCreatedBookingId] = useState<string | null>(null);
 
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   const selectedSessionData = sessionTypes.find(s => s.id === selectedSession);
+  const totalPrice = (selectedSessionData?.priceKES || 0) * (selectedSessionData?.duration || 1);
   const selectedProducerData = producers.find(p => p.id === selectedProducer);
 
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(calendarWeekStart, i));
@@ -99,24 +104,23 @@ const Booking = () => {
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase.from("bookings").insert({
+      // Create booking with pending status
+      const { data: booking, error } = await supabase.from("bookings").insert({
         client_id: user.id,
         session_type: selectedSession as "recording" | "mixing" | "mastering" | "production" | "consultation",
         session_date: format(selectedDate, "yyyy-MM-dd"),
         start_time: selectedTime,
         duration_hours: selectedSessionData?.duration || 2,
-        total_price: selectedSessionData?.price || 0,
+        total_price: totalPrice,
         notes: notes || null,
-      });
+        status: "pending",
+      }).select().single();
 
       if (error) throw error;
 
-      toast({
-        title: "Booking confirmed!",
-        description: "You'll receive a confirmation email shortly.",
-      });
-
-      navigate("/dashboard");
+      // Store booking ID and show M-Pesa dialog
+      setCreatedBookingId(booking.id);
+      setShowMpesaDialog(true);
     } catch (error) {
       toast({
         title: "Booking failed",
@@ -126,6 +130,16 @@ const Booking = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handlePaymentSuccess = () => {
+    toast({
+      title: "Booking confirmed!",
+      description: "Payment successful. You'll receive a confirmation shortly.",
+    });
+    setTimeout(() => {
+      navigate("/dashboard");
+    }, 2000);
   };
 
   return (
@@ -198,7 +212,7 @@ const Booking = () => {
                               <Clock className="w-4 h-4 inline mr-1" />
                               {session.duration}h
                             </span>
-                            <span className="font-display font-bold text-primary">${session.price}/hr</span>
+                            <span className="font-display font-bold text-primary">KES {session.priceKES.toLocaleString()}/hr</span>
                           </div>
                         </div>
                       </div>
@@ -367,7 +381,7 @@ const Booking = () => {
                     <div className="flex items-center justify-between py-3">
                       <span className="text-muted-foreground">Total</span>
                       <span className="font-display font-bold text-2xl text-primary">
-                        ${(selectedSessionData?.price || 0) * (selectedSessionData?.duration || 1)}
+                        KES {totalPrice.toLocaleString()}
                       </span>
                     </div>
                   </div>
@@ -413,9 +427,10 @@ const Booking = () => {
                   variant="hero"
                   onClick={handleSubmit}
                   disabled={isSubmitting}
+                  className="gap-2"
                 >
-                  {isSubmitting ? "Booking..." : "Confirm Booking"}
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                  <Smartphone className="w-5 h-5" />
+                  {isSubmitting ? "Processing..." : "Pay with M-Pesa"}
                 </Button>
               )}
             </div>
@@ -424,6 +439,23 @@ const Booking = () => {
       </main>
 
       <Footer />
+
+      {/* M-Pesa Checkout Dialog */}
+      <MpesaCheckoutDialog
+        open={showMpesaDialog}
+        onOpenChange={(open) => {
+          setShowMpesaDialog(open);
+          if (!open && createdBookingId) {
+            // If dialog closed without payment, we could cancel the booking
+            // For now, let it remain pending
+          }
+        }}
+        amount={totalPrice}
+        description={`${selectedSessionData?.name || "Session"} booking - ${selectedDate ? format(selectedDate, "MMM d, yyyy") : ""} at ${selectedTime || ""}`}
+        paymentType="booking"
+        referenceId={createdBookingId || undefined}
+        onSuccess={handlePaymentSuccess}
+      />
     </div>
   );
 };
