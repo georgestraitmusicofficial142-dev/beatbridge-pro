@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { AudioPlayer } from "@/components/audio/AudioPlayer";
 import { BeatCard } from "@/components/beats/BeatCard";
+import { BeatPreviewPlayer } from "@/components/beats/BeatPreviewPlayer";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { MpesaCheckoutDialog } from "@/components/payments/MpesaCheckoutDialog";
 import { BeatUploadDialog } from "@/components/beats/BeatUploadDialog";
 import { useBeats } from "@/hooks/useBeats";
 import { supabase } from "@/integrations/supabase/client";
@@ -47,6 +49,9 @@ const Beats = () => {
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [isProducer, setIsProducer] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [showLicenseDialog, setShowLicenseDialog] = useState(false);
+  const [showMpesaDialog, setShowMpesaDialog] = useState(false);
+  const [selectedLicense, setSelectedLicense] = useState<{ type: string; price: number } | null>(null);
 
   const { beats, loading, refetch } = useBeats({
     searchQuery,
@@ -245,29 +250,108 @@ const Beats = () => {
           )}
         </div>
 
-        {/* Global Audio Player */}
+        {/* Beat Preview Player with Waveform */}
         {playingBeat && (
-          <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-background/80 backdrop-blur-xl border-t border-border/50">
-            <div className="container mx-auto">
-              <AudioPlayer
-                title={playingBeat.title}
-                artist={playingBeat.producer?.full_name || "Unknown Producer"}
-                coverUrl={playingBeat.cover_url || undefined}
-                audioUrl={playingBeat.audio_url}
-                compact
-                onNext={() => {
-                  const currentIndex = beats.findIndex(b => b.id === playingBeatId);
-                  const nextBeat = beats[currentIndex + 1];
-                  if (nextBeat) setPlayingBeatId(nextBeat.id);
-                }}
-                onPrevious={() => {
-                  const currentIndex = beats.findIndex(b => b.id === playingBeatId);
-                  const prevBeat = beats[currentIndex - 1];
-                  if (prevBeat) setPlayingBeatId(prevBeat.id);
-                }}
-              />
+          <BeatPreviewPlayer
+            beat={playingBeat}
+            onClose={() => setPlayingBeatId(null)}
+            onNext={() => {
+              const currentIndex = beats.findIndex(b => b.id === playingBeatId);
+              const nextBeat = beats[currentIndex + 1];
+              if (nextBeat) setPlayingBeatId(nextBeat.id);
+            }}
+            onPrevious={() => {
+              const currentIndex = beats.findIndex(b => b.id === playingBeatId);
+              const prevBeat = beats[currentIndex - 1];
+              if (prevBeat) setPlayingBeatId(prevBeat.id);
+            }}
+            onPurchase={() => setShowLicenseDialog(true)}
+          />
+        )}
+
+        {/* License Selection Dialog */}
+        <Dialog open={showLicenseDialog} onOpenChange={setShowLicenseDialog}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="font-display">Select License Type</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3 mt-4">
+              {playingBeat && (
+                <>
+                  <button
+                    onClick={() => {
+                      setSelectedLicense({ type: "Basic", price: playingBeat.price_basic });
+                      setShowLicenseDialog(false);
+                      setShowMpesaDialog(true);
+                    }}
+                    className="w-full p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-all text-left"
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h4 className="font-semibold">Basic License</h4>
+                        <p className="text-sm text-muted-foreground">MP3 file, non-exclusive</p>
+                      </div>
+                      <span className="font-display font-bold text-primary">
+                        KES {playingBeat.price_basic.toLocaleString()}
+                      </span>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedLicense({ type: "Premium", price: playingBeat.price_premium });
+                      setShowLicenseDialog(false);
+                      setShowMpesaDialog(true);
+                    }}
+                    className="w-full p-4 rounded-xl border border-accent/30 bg-accent/5 hover:border-accent/50 transition-all text-left"
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h4 className="font-semibold text-accent">Premium License</h4>
+                        <p className="text-sm text-muted-foreground">WAV + stems, non-exclusive</p>
+                      </div>
+                      <span className="font-display font-bold text-accent">
+                        KES {playingBeat.price_premium.toLocaleString()}
+                      </span>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedLicense({ type: "Exclusive", price: playingBeat.price_exclusive });
+                      setShowLicenseDialog(false);
+                      setShowMpesaDialog(true);
+                    }}
+                    className="w-full p-4 rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 to-accent/10 hover:border-primary/50 transition-all text-left"
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h4 className="font-semibold gradient-text">Exclusive License</h4>
+                        <p className="text-sm text-muted-foreground">Full ownership, removed from store</p>
+                      </div>
+                      <span className="font-display font-bold gradient-text">
+                        KES {playingBeat.price_exclusive.toLocaleString()}
+                      </span>
+                    </div>
+                  </button>
+                </>
+              )}
             </div>
-          </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* M-Pesa Checkout */}
+        {playingBeat && selectedLicense && (
+          <MpesaCheckoutDialog
+            open={showMpesaDialog}
+            onOpenChange={setShowMpesaDialog}
+            amount={selectedLicense.price}
+            description={`${selectedLicense.type} License - ${playingBeat.title}`}
+            referenceId={playingBeat.id}
+            paymentType="beat_purchase"
+            onSuccess={() => {
+              setShowMpesaDialog(false);
+              setSelectedLicense(null);
+            }}
+          />
         )}
       </main>
 
