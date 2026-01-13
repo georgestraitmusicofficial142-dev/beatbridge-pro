@@ -9,10 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { BeatCard } from "@/components/beats/BeatCard";
 import { BeatPreviewPlayer } from "@/components/beats/BeatPreviewPlayer";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { MpesaCheckoutDialog } from "@/components/payments/MpesaCheckoutDialog";
 import { BeatUploadDialog } from "@/components/beats/BeatUploadDialog";
 import { useBeats } from "@/hooks/useBeats";
+import { useAudioQueue } from "@/contexts/AudioQueueContext";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -44,14 +43,12 @@ const Beats = () => {
   const [selectedGenre, setSelectedGenre] = useState<BeatGenre | "all">("all");
   const [selectedMood, setSelectedMood] = useState<BeatMood | "all">("all");
   const [bpmRange, setBpmRange] = useState<[number, number]>([60, 180]);
-  const [playingBeatId, setPlayingBeatId] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [isProducer, setIsProducer] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const [showLicenseDialog, setShowLicenseDialog] = useState(false);
-  const [showMpesaDialog, setShowMpesaDialog] = useState(false);
-  const [selectedLicense, setSelectedLicense] = useState<{ type: string; price: number } | null>(null);
+
+  const { currentBeat, playBeat, isPlaying } = useAudioQueue();
 
   const { beats, loading, refetch } = useBeats({
     searchQuery,
@@ -60,7 +57,6 @@ const Beats = () => {
     bpmRange,
   });
 
-  // Check if user is a producer
   useEffect(() => {
     const checkUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -86,13 +82,28 @@ const Beats = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const playingBeat = beats.find(b => b.id === playingBeatId);
+  const handlePlayBeat = (beat: typeof beats[0]) => {
+    playBeat({
+      id: beat.id,
+      title: beat.title,
+      audio_url: beat.audio_url,
+      cover_url: beat.cover_url,
+      bpm: beat.bpm,
+      key: beat.key,
+      genre: beat.genre,
+      mood: beat.mood,
+      price_basic: Number(beat.price_basic),
+      price_premium: Number(beat.price_premium),
+      price_exclusive: Number(beat.price_exclusive),
+      producer: beat.producer,
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <main className="pt-24 pb-16">
+      <main className="pt-24 pb-32">
         <div className="container mx-auto px-6">
           {/* Header */}
           <motion.div
@@ -223,8 +234,8 @@ const Beats = () => {
                 <BeatCard
                   key={beat.id}
                   beat={beat}
-                  isPlaying={playingBeatId === beat.id}
-                  onPlay={() => setPlayingBeatId(playingBeatId === beat.id ? null : beat.id)}
+                  isPlaying={currentBeat?.id === beat.id && isPlaying}
+                  onPlay={() => handlePlayBeat(beat)}
                 />
               ))}
             </div>
@@ -250,109 +261,8 @@ const Beats = () => {
           )}
         </div>
 
-        {/* Beat Preview Player with Waveform */}
-        {playingBeat && (
-          <BeatPreviewPlayer
-            beat={playingBeat}
-            onClose={() => setPlayingBeatId(null)}
-            onNext={() => {
-              const currentIndex = beats.findIndex(b => b.id === playingBeatId);
-              const nextBeat = beats[currentIndex + 1];
-              if (nextBeat) setPlayingBeatId(nextBeat.id);
-            }}
-            onPrevious={() => {
-              const currentIndex = beats.findIndex(b => b.id === playingBeatId);
-              const prevBeat = beats[currentIndex - 1];
-              if (prevBeat) setPlayingBeatId(prevBeat.id);
-            }}
-            onPurchase={() => setShowLicenseDialog(true)}
-          />
-        )}
-
-        {/* License Selection Dialog */}
-        <Dialog open={showLicenseDialog} onOpenChange={setShowLicenseDialog}>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle className="font-display">Select License Type</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-3 mt-4">
-              {playingBeat && (
-                <>
-                  <button
-                    onClick={() => {
-                      setSelectedLicense({ type: "Basic", price: playingBeat.price_basic });
-                      setShowLicenseDialog(false);
-                      setShowMpesaDialog(true);
-                    }}
-                    className="w-full p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-primary/5 transition-all text-left"
-                  >
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h4 className="font-semibold">Basic License</h4>
-                        <p className="text-sm text-muted-foreground">MP3 file, non-exclusive</p>
-                      </div>
-                      <span className="font-display font-bold text-primary">
-                        KES {playingBeat.price_basic.toLocaleString()}
-                      </span>
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setSelectedLicense({ type: "Premium", price: playingBeat.price_premium });
-                      setShowLicenseDialog(false);
-                      setShowMpesaDialog(true);
-                    }}
-                    className="w-full p-4 rounded-xl border border-accent/30 bg-accent/5 hover:border-accent/50 transition-all text-left"
-                  >
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h4 className="font-semibold text-accent">Premium License</h4>
-                        <p className="text-sm text-muted-foreground">WAV + stems, non-exclusive</p>
-                      </div>
-                      <span className="font-display font-bold text-accent">
-                        KES {playingBeat.price_premium.toLocaleString()}
-                      </span>
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setSelectedLicense({ type: "Exclusive", price: playingBeat.price_exclusive });
-                      setShowLicenseDialog(false);
-                      setShowMpesaDialog(true);
-                    }}
-                    className="w-full p-4 rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 to-accent/10 hover:border-primary/50 transition-all text-left"
-                  >
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h4 className="font-semibold gradient-text">Exclusive License</h4>
-                        <p className="text-sm text-muted-foreground">Full ownership, removed from store</p>
-                      </div>
-                      <span className="font-display font-bold gradient-text">
-                        KES {playingBeat.price_exclusive.toLocaleString()}
-                      </span>
-                    </div>
-                  </button>
-                </>
-              )}
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* M-Pesa Checkout */}
-        {playingBeat && selectedLicense && (
-          <MpesaCheckoutDialog
-            open={showMpesaDialog}
-            onOpenChange={setShowMpesaDialog}
-            amount={selectedLicense.price}
-            description={`${selectedLicense.type} License - ${playingBeat.title}`}
-            referenceId={playingBeat.id}
-            paymentType="beat_purchase"
-            onSuccess={() => {
-              setShowMpesaDialog(false);
-              setSelectedLicense(null);
-            }}
-          />
-        )}
+        {/* Global Beat Preview Player */}
+        {currentBeat && <BeatPreviewPlayer />}
       </main>
 
       <Footer />

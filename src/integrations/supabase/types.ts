@@ -563,6 +563,35 @@ export type Database = {
         }
         Relationships: []
       }
+      wishlist: {
+        Row: {
+          beat_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          beat_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          beat_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wishlist_beat_id_fkey"
+            columns: ["beat_id"]
+            isOneToOne: false
+            referencedRelation: "beats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

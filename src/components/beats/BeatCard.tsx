@@ -1,11 +1,16 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Play, Pause, ShoppingCart, Zap, Shield, Award, Globe } from "lucide-react";
+import { Play, Pause, ShoppingCart, Zap, Shield, Award, Globe, Heart, ListPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { MpesaCheckoutDialog } from "@/components/payments/MpesaCheckoutDialog";
+import { MiniWaveform } from "@/components/ui/MiniWaveform";
 import { useCurrency } from "@/hooks/useCurrency";
+import { useWishlist } from "@/hooks/useWishlist";
+import { useAudioQueue } from "@/contexts/AudioQueueContext";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
 
 type Beat = Database["public"]["Tables"]["beats"]["Row"] & {
@@ -55,7 +60,13 @@ export const BeatCard = ({ beat, isPlaying, onPlay }: BeatCardProps) => {
   const [showLicenseDialog, setShowLicenseDialog] = useState(false);
   const [showMpesaDialog, setShowMpesaDialog] = useState(false);
   const [selectedLicense, setSelectedLicense] = useState<{ type: string; price: number } | null>(null);
+  const [isHovered, setIsHovered] = useState(false);
   const { formatPrice } = useCurrency();
+  const { isInWishlist, toggleWishlist } = useWishlist();
+  const { addToQueue } = useAudioQueue();
+
+  const isLiked = isInWishlist(beat.id);
+
   // For sample beats (no producer), show WE Global as producer with global_staff badge
   const isSampleBeat = !beat.producer_id;
   const producerName = isSampleBeat ? "WE Global Studio" : (beat.producer?.full_name || "Unknown Producer");
@@ -63,11 +74,37 @@ export const BeatCard = ({ beat, isPlaying, onPlay }: BeatCardProps) => {
   const producerCountry = isSampleBeat ? "Kenya" : beat.producer?.country;
   const isPartnerOrStaff = producerBadge === "global_staff" || producerBadge === "partner";
 
+  const handleAddToQueue = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    addToQueue({
+      id: beat.id,
+      title: beat.title,
+      audio_url: beat.audio_url,
+      cover_url: beat.cover_url,
+      bpm: beat.bpm,
+      key: beat.key,
+      genre: beat.genre,
+      mood: beat.mood,
+      price_basic: Number(beat.price_basic),
+      price_premium: Number(beat.price_premium),
+      price_exclusive: Number(beat.price_exclusive),
+      producer: beat.producer,
+    });
+    toast.success(`Added "${beat.title}" to queue`);
+  };
+
+  const handleToggleWishlist = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    await toggleWishlist(beat.id);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="group relative bg-card rounded-2xl border border-border/50 overflow-hidden hover:border-primary/30 transition-all duration-300"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {/* Partner/Staff indicator */}
       {isPartnerOrStaff && (
@@ -109,9 +146,32 @@ export const BeatCard = ({ beat, isPlaying, onPlay }: BeatCardProps) => {
           )}
         </div>
 
+        {/* Top Right Actions */}
+        <div className="absolute top-3 right-3 flex items-center gap-2">
+          {/* Wishlist Button */}
+          <button
+            onClick={handleToggleWishlist}
+            className={cn(
+              "w-8 h-8 rounded-full flex items-center justify-center transition-all",
+              "bg-background/80 backdrop-blur-sm",
+              isLiked ? "text-red-500" : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Heart className={cn("w-4 h-4", isLiked && "fill-current")} />
+          </button>
+          
+          {/* Add to Queue Button */}
+          <button
+            onClick={handleAddToQueue}
+            className="w-8 h-8 rounded-full flex items-center justify-center bg-background/80 backdrop-blur-sm text-muted-foreground hover:text-foreground transition-all"
+          >
+            <ListPlus className="w-4 h-4" />
+          </button>
+        </div>
+
         {/* Country Flag */}
         {producerCountry && (
-          <div className="absolute top-3 right-3">
+          <div className="absolute bottom-3 right-3">
             <Badge variant="outline" className="bg-background/80 backdrop-blur-sm text-xs">
               🇰🇪 {producerCountry}
             </Badge>
@@ -119,8 +179,20 @@ export const BeatCard = ({ beat, isPlaying, onPlay }: BeatCardProps) => {
         )}
       </div>
 
+      {/* Mini Waveform Preview */}
+      <div className="px-5 pt-3 -mb-1">
+        <MiniWaveform
+          beatId={beat.id}
+          isPlaying={isPlaying}
+          isHovered={isHovered}
+          progress={isPlaying ? 50 : 0}
+          className="h-6"
+          barCount={40}
+        />
+      </div>
+
       {/* Info */}
-      <div className="p-5">
+      <div className="p-5 pt-3">
         <div className="flex items-start justify-between mb-2">
           <div className="flex-1 min-w-0">
             <h3 className="font-display font-semibold text-lg text-foreground group-hover:text-primary transition-colors truncate">
