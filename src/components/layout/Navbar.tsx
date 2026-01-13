@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Headphones, User, Shield } from "lucide-react";
+import { Menu, X, Headphones, User, Shield, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -105,6 +105,9 @@ export const Navbar = () => {
           <div className="hidden lg:flex items-center gap-3">
             {user ? (
               <>
+                <Button variant="ghost" size="icon" onClick={() => navigate("/wishlist")} title="Wishlist">
+                  <Heart className="w-4 h-4" />
+                </Button>
                 {isAdmin && (
                   <Button variant="ghost" size="sm" onClick={() => navigate("/admin")}>
                     <Shield className="w-4 h-4 mr-2" />
