@@ -420,6 +420,41 @@ export type Database = {
         }
         Relationships: []
       }
+      play_history: {
+        Row: {
+          beat_id: string
+          completed: boolean | null
+          duration_seconds: number | null
+          id: string
+          played_at: string
+          user_id: string
+        }
+        Insert: {
+          beat_id: string
+          completed?: boolean | null
+          duration_seconds?: number | null
+          id?: string
+          played_at?: string
+          user_id: string
+        }
+        Update: {
+          beat_id?: string
+          completed?: boolean | null
+          duration_seconds?: number | null
+          id?: string
+          played_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "play_history_beat_id_fkey"
+            columns: ["beat_id"]
+            isOneToOne: false
+            referencedRelation: "beats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null

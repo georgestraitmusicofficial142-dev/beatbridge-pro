@@ -14,7 +14,8 @@ import {
   DollarSign,
   Users,
   Headphones,
-  ArrowLeftRight
+  ArrowLeftRight,
+  Heart
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +24,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { ArtistDashboard } from "@/components/dashboard/ArtistDashboard";
 import { ProducerDashboard } from "@/components/dashboard/ProducerDashboard";
+import { RecentlyPlayed } from "@/components/dashboard/RecentlyPlayed";
+import { Recommendations } from "@/components/dashboard/Recommendations";
+import { BeatPreviewPlayer } from "@/components/beats/BeatPreviewPlayer";
+import { useAudioQueue } from "@/contexts/AudioQueueContext";
 
 interface Profile {
   full_name: string | null;
@@ -48,6 +53,7 @@ interface Project {
 
 const Dashboard = () => {
   const { user, signOut, loading } = useAuth();
+  const { currentBeat } = useAudioQueue();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -274,7 +280,11 @@ const Dashboard = () => {
                 ))}
               </div>
 
-              {/* Recent Activity */}
+              {/* Recently Played & Recommendations */}
+              <div className="space-y-8 mb-8">
+                <RecentlyPlayed />
+                <Recommendations limit={4} />
+              </div>
               <div className="grid lg:grid-cols-2 gap-6">
                 {/* Upcoming Bookings */}
                 <div className="p-6 rounded-xl bg-card border border-border/50">
@@ -510,6 +520,9 @@ const Dashboard = () => {
           )}
         </div>
       </main>
+
+      {/* Global Audio Player */}
+      {currentBeat && <BeatPreviewPlayer />}
     </div>
   );
 };
