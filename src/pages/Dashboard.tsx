@@ -393,12 +393,24 @@ const Dashboard = () => {
                             {format(new Date(booking.session_date), "EEEE, MMMM d, yyyy")} at {booking.start_time}
                           </p>
                         </div>
-                        <div className="text-right">
-                          <Badge className={getStatusColor(booking.status)}>
-                            {booking.status}
-                          </Badge>
-                          {booking.total_price && (
-                            <p className="text-sm font-medium mt-1">${booking.total_price}</p>
+                        <div className="text-right flex items-center gap-3">
+                          <div>
+                            <Badge className={getStatusColor(booking.status)}>
+                              {booking.status}
+                            </Badge>
+                            {booking.total_price && (
+                              <p className="text-sm font-medium mt-1">${booking.total_price}</p>
+                            )}
+                          </div>
+                          {booking.status === "pending" && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => navigate("/booking")}
+                              className="text-xs"
+                            >
+                              Retry Payment
+                            </Button>
                           )}
                         </div>
                       </div>

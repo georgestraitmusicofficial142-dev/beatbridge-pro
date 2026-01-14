@@ -17,6 +17,10 @@ import Services from "./pages/Services";
 import Library from "./pages/Library";
 import Outreach from "./pages/Outreach";
 import Wishlist from "./pages/Wishlist";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import Licensing from "./pages/Licensing";
+import Support from "./pages/Support";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +46,10 @@ const App = () => (
               <Route path="/library" element={<Library />} />
               <Route path="/outreach" element={<Outreach />} />
               <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/licensing" element={<Licensing />} />
+              <Route path="/support" element={<Support />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

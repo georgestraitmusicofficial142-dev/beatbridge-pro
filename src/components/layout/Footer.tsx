@@ -19,10 +19,10 @@ const footerLinks = {
     { label: "Contact", href: "/contact" },
   ],
   legal: [
-    { label: "Privacy Policy", href: "#" },
-    { label: "Terms of Service", href: "#" },
-    { label: "Licensing", href: "#" },
-    { label: "Support", href: "/contact" },
+    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Terms of Service", href: "/terms" },
+    { label: "Licensing", href: "/licensing" },
+    { label: "Support", href: "/support" },
   ],
 };
 
