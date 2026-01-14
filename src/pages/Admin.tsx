@@ -41,6 +41,7 @@ import { UsersPanel } from "@/components/admin/UsersPanel";
 import { OutreachPanel } from "@/components/admin/OutreachPanel";
 import { PayoutsPanel } from "@/components/admin/PayoutsPanel";
 import { AnalyticsPanel } from "@/components/admin/AnalyticsPanel";
+import { ContentPanel } from "@/components/admin/ContentPanel";
 
 interface Beat {
   id: string;
@@ -676,24 +677,7 @@ const Admin = () => {
           {activeTab === "analytics" && <AnalyticsPanel />}
 
           {/* Content Tab */}
-          {activeTab === "content" && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-              <h2 className="font-display text-2xl font-semibold mb-6">Content Management</h2>
-              <div className="grid md:grid-cols-3 gap-6">
-                {[
-                  { title: "Portfolio", desc: "Manage featured releases", icon: Image },
-                  { title: "Blog Posts", desc: "Create and edit articles", icon: FileText },
-                  { title: "Featured Artists", desc: "Spotlight collaborations", icon: Users },
-                ].map((item, i) => (
-                  <div key={i} className="p-6 rounded-xl bg-card border border-border/50 hover:border-primary/30 transition-all cursor-pointer">
-                    <item.icon className="w-10 h-10 text-primary mb-4" />
-                    <h3 className="font-display text-lg font-semibold mb-2">{item.title}</h3>
-                    <p className="text-muted-foreground text-sm">{item.desc}</p>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
+          {activeTab === "content" && <ContentPanel />}
 
           {/* Outreach Tab */}
           {activeTab === "outreach" && <OutreachPanel />}
