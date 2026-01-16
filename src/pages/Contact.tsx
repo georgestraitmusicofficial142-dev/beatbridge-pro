@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PageMeta } from "@/components/seo/PageMeta";
 import { useToast } from "@/hooks/use-toast";
 
 const contactSchema = z.object({
@@ -105,6 +106,11 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <PageMeta
+        title="Contact Us"
+        description="Get in touch with WE Global Music Studio. We respond within 24 hours. Based in Los Angeles, London, and Nairobi."
+        path="/contact"
+      />
       <Navbar />
       
       <main className="pt-24 pb-16">

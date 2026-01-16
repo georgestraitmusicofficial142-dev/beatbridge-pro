@@ -7,10 +7,16 @@ import { BookSessionCTA } from "@/components/home/BookSessionCTA";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { OutreachSection } from "@/components/home/OutreachSection";
 import { Footer } from "@/components/layout/Footer";
+import { PageMeta } from "@/components/seo/PageMeta";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
+      <PageMeta
+        title="World-Class Music Production"
+        description="WE Global connects artists, producers, and labels through professional music production, mixing, mastering, and beat licensing. Book a session today."
+        path="/"
+      />
       <Navbar />
       <main>
         <HeroSection />

@@ -5,6 +5,7 @@ import { Headphones, Mail, Lock, User, ArrowRight, Music } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PageMeta } from "@/components/seo/PageMeta";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
@@ -102,6 +103,11 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-background flex">
+      <PageMeta
+        title={isLogin ? "Sign In" : "Create Account"}
+        description="Sign in or create an account to access your dashboard, purchase beats, and book sessions."
+        path="/auth"
+      />
       {/* Left Panel - Branding */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/10" />

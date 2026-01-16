@@ -6,6 +6,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { PageMeta } from "@/components/seo/PageMeta";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -144,6 +145,11 @@ const Booking = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <PageMeta
+        title="Book a Session"
+        description="Schedule recording, mixing, mastering, or production sessions with world-class producers. M-Pesa payments accepted."
+        path="/booking"
+      />
       <Navbar />
       
       <main className="pt-24 pb-16">
