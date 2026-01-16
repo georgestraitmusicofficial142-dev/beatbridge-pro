@@ -16,6 +16,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { PageMeta } from "@/components/seo/PageMeta";
 
 const services = [
   {
@@ -123,6 +124,11 @@ const pricingTiers = [
 const Services = () => {
   return (
     <div className="min-h-screen bg-background">
+      <PageMeta
+        title="Services & Pricing"
+        description="Professional music production, mixing, mastering, and recording services. Flexible packages from $99 to enterprise solutions for labels."
+        path="/services"
+      />
       <Navbar />
       
       <main className="pt-24 pb-16">

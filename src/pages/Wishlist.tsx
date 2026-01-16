@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { MiniWaveform } from "@/components/ui/MiniWaveform";
 import { BeatPreviewPlayer } from "@/components/beats/BeatPreviewPlayer";
+import { PageMeta } from "@/components/seo/PageMeta";
 import { useWishlist } from "@/hooks/useWishlist";
 import { useAudioQueue } from "@/contexts/AudioQueueContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -112,6 +113,11 @@ const Wishlist = () => {
   if (!user) {
     return (
       <div className="min-h-screen bg-background">
+        <PageMeta
+          title="My Wishlist"
+          description="Save your favorite beats and access them anytime. Sign in to view your wishlist."
+          path="/wishlist"
+        />
         <Navbar />
         <main className="pt-24 pb-16">
           <div className="container mx-auto px-6 text-center py-16">
@@ -130,6 +136,11 @@ const Wishlist = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <PageMeta
+        title="My Wishlist"
+        description="Your saved beats collection. Browse your favorite beats and purchase them with flexible licensing."
+        path="/wishlist"
+      />
       <Navbar />
 
       <main className="pt-24 pb-32">

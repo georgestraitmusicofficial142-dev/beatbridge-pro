@@ -20,6 +20,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { WaveformVisualizer } from "@/components/ui/WaveformVisualizer";
+import { PageMeta } from "@/components/seo/PageMeta";
 import { useNavigate } from "react-router-dom";
 
 const equipmentCategories = [
@@ -118,6 +119,11 @@ const Studio = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <PageMeta
+        title="Our Studio"
+        description="Experience our state-of-the-art production facility with professional recording equipment, Neumann mics, Neve preamps, and world-class acoustics."
+        path="/studio"
+      />
       <Navbar />
 
       <main className="pt-24 pb-16">

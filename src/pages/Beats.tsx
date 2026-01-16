@@ -10,6 +10,7 @@ import { Slider } from "@/components/ui/slider";
 import { BeatCard } from "@/components/beats/BeatCard";
 import { BeatPreviewPlayer } from "@/components/beats/BeatPreviewPlayer";
 import { BeatUploadDialog } from "@/components/beats/BeatUploadDialog";
+import { PageMeta } from "@/components/seo/PageMeta";
 import { useBeats } from "@/hooks/useBeats";
 import { useAudioQueue } from "@/contexts/AudioQueueContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -101,6 +102,11 @@ const Beats = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <PageMeta
+        title="Beat Marketplace"
+        description="Browse exclusive beats from top African producers. Find Afrobeats, Hip-Hop, R&B, and Trap beats with flexible licensing options."
+        path="/beats"
+      />
       <Navbar />
       
       <main className="pt-24 pb-32">
