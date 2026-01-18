@@ -6,6 +6,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AudioQueueProvider } from "@/contexts/AudioQueueContext";
+import { CommandPalette } from "@/components/ui/CommandPalette";
+import { QuickActions } from "@/components/ui/QuickActions";
+import { PWAInstallPrompt } from "@/components/ui/PWAInstallPrompt";
+import { ScrollToTop } from "@/components/ui/ScrollToTop";
+import { OnlineIndicator } from "@/components/ui/OnlineIndicator";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Beats from "./pages/Beats";
@@ -43,6 +48,11 @@ const App = () => (
             <TooltipProvider>
               <Toaster />
               <Sonner />
+              <CommandPalette />
+              <QuickActions />
+              <PWAInstallPrompt />
+              <ScrollToTop />
+              <OnlineIndicator />
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />

@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Headphones, User, Shield, Heart } from "lucide-react";
+import { Menu, X, Headphones, User, Shield, Heart, Command } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { NotificationCenter } from "@/components/ui/NotificationCenter";
+import { KeyboardShortcutsHelp } from "@/components/ui/KeyboardShortcutsHelp";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -102,9 +104,23 @@ export const Navbar = () => {
           </div>
 
           {/* CTA Buttons */}
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-2">
+            {/* Command Palette Trigger */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => window.dispatchEvent(new CustomEvent("openCommandPalette"))}
+              className="hidden xl:flex items-center gap-2 text-muted-foreground hover:text-foreground"
+            >
+              <Command className="w-4 h-4" />
+              <kbd className="px-1.5 py-0.5 text-[10px] font-mono bg-secondary rounded">⌘K</kbd>
+            </Button>
+            
+            <KeyboardShortcutsHelp />
+            
             {user ? (
               <>
+                <NotificationCenter />
                 <Button variant="ghost" size="icon" onClick={() => navigate("/wishlist")} title="Wishlist">
                   <Heart className="w-4 h-4" />
                 </Button>
