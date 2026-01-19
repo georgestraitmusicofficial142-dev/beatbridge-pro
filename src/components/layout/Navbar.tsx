@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Headphones, User, Shield, Heart, Command } from "lucide-react";
+import { Menu, X, Headphones, User, Shield, Heart, Command, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -121,6 +121,9 @@ export const Navbar = () => {
             {user ? (
               <>
                 <NotificationCenter />
+                <Button variant="ghost" size="icon" onClick={() => navigate("/chat")} title="Messages">
+                  <MessageSquare className="w-4 h-4" />
+                </Button>
                 <Button variant="ghost" size="icon" onClick={() => navigate("/wishlist")} title="Wishlist">
                   <Heart className="w-4 h-4" />
                 </Button>

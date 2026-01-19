@@ -30,6 +30,7 @@ import {
   Mail,
   Sparkles,
   Zap,
+  MessageSquare,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAudioQueue } from "@/contexts/AudioQueueContext";
@@ -140,6 +141,14 @@ export const CommandPalette = () => {
       icon: <Sparkles className="w-4 h-4" />,
       action: () => navigate("/outreach"),
       keywords: ["talent", "discovery", "community"],
+    },
+    {
+      id: "chat",
+      label: "Messages",
+      icon: <MessageSquare className="w-4 h-4" />,
+      shortcut: "⌘M",
+      action: () => navigate("/chat"),
+      keywords: ["chat", "messages", "collaborate", "conversation"],
     },
   ];
 
