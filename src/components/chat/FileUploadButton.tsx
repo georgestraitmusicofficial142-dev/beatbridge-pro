@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Paperclip, Image, FileAudio, FileText, X, Upload, Loader2 } from "lucide-react";
+import { Paperclip, Image, FileAudio, FileText, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -22,13 +22,57 @@ interface FileUploadButtonProps {
   disabled?: boolean;
 }
 
-const ACCEPTED_TYPES = {
+export const ACCEPTED_TYPES = {
   image: "image/jpeg,image/png,image/gif,image/webp",
   audio: "audio/mpeg,audio/wav,audio/mp3,audio/ogg",
   document: "application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,application/zip",
 };
 
-const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+export const ACCEPTED_MIME_TYPES = [
+  "image/jpeg", "image/png", "image/gif", "image/webp",
+  "audio/mpeg", "audio/wav", "audio/mp3", "audio/ogg",
+  "application/pdf", "application/msword", 
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "text/plain", "application/zip"
+];
+
+export const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+
+export const getFileType = (mimeType: string): string => {
+  if (mimeType.startsWith("image/")) return "image";
+  if (mimeType.startsWith("audio/")) return "audio";
+  return "document";
+};
+
+export const uploadFile = async (
+  file: File,
+  userId: string,
+  conversationId: string
+): Promise<{ url: string; fileName: string; fileType: string }> => {
+  const fileExt = file.name.split(".").pop();
+  const fileName = `${userId}/${conversationId}/${Date.now()}.${fileExt}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("chat-files")
+    .upload(fileName, file);
+
+  if (uploadError) throw uploadError;
+
+  // For private buckets, we need to create a signed URL
+  const { data: signedData, error: signedError } = await supabase.storage
+    .from("chat-files")
+    .createSignedUrl(fileName, 60 * 60 * 24 * 365); // 1 year expiry
+
+  if (signedError) throw signedError;
+
+  const fileType = getFileType(file.type);
+  
+  return {
+    url: signedData.signedUrl,
+    fileName: file.name,
+    fileType,
+  };
+};
 
 export const FileUploadButton = ({
   conversationId,
@@ -50,12 +94,6 @@ export const FileUploadButton = ({
     setTimeout(() => fileInputRef.current?.click(), 0);
   };
 
-  const getFileType = (mimeType: string): string => {
-    if (mimeType.startsWith("image/")) return "image";
-    if (mimeType.startsWith("audio/")) return "audio";
-    return "document";
-  };
-
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
@@ -72,28 +110,8 @@ export const FileUploadButton = ({
     setUploading(true);
 
     try {
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${user.id}/${conversationId}/${Date.now()}.${fileExt}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("chat-files")
-        .upload(fileName, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: urlData } = supabase.storage
-        .from("chat-files")
-        .getPublicUrl(fileName);
-
-      // For private buckets, we need to create a signed URL
-      const { data: signedData, error: signedError } = await supabase.storage
-        .from("chat-files")
-        .createSignedUrl(fileName, 60 * 60 * 24 * 365); // 1 year expiry
-
-      if (signedError) throw signedError;
-
-      const fileType = getFileType(file.type);
-      onFileUploaded(signedData.signedUrl, file.name, fileType);
+      const result = await uploadFile(file, user.id, conversationId);
+      onFileUploaded(result.url, result.fileName, result.fileType);
 
       toast({
         title: "File uploaded",
@@ -145,24 +163,20 @@ export const FileUploadButton = ({
         </Tooltip>
         <DropdownMenuContent align="start" className="w-48">
           <DropdownMenuItem onClick={() => handleFileSelect("image")}>
-            <Image className="w-4 h-4 mr-2 text-primary" />
+            <Image className="w-4 h-4 mr-2" />
             Image
-            <span className="ml-auto text-xs text-muted-foreground">JPG, PNG, GIF</span>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleFileSelect("audio")}>
-            <FileAudio className="w-4 h-4 mr-2 text-primary" />
-            Audio
-            <span className="ml-auto text-xs text-muted-foreground">MP3, WAV</span>
+            <FileAudio className="w-4 h-4 mr-2" />
+            Audio File
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleFileSelect("document")}>
-            <FileText className="w-4 h-4 mr-2 text-primary" />
+            <FileText className="w-4 h-4 mr-2" />
             Document
-            <span className="ml-auto text-xs text-muted-foreground">PDF, DOC</span>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleFileSelect("all")}>
-            <Upload className="w-4 h-4 mr-2" />
+            <Paperclip className="w-4 h-4 mr-2" />
             Any File
-            <span className="ml-auto text-xs text-muted-foreground">Max 50MB</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

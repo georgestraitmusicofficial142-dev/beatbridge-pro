@@ -11,6 +11,7 @@ import {
   Trash2,
   Check,
   X,
+  Upload,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -32,8 +33,10 @@ import {
 import { Message, Conversation, useTypingIndicator } from "@/hooks/useChat";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
-import { FileUploadButton } from "./FileUploadButton";
+import { FileUploadButton, uploadFile, ACCEPTED_MIME_TYPES, MAX_FILE_SIZE } from "./FileUploadButton";
 import { FileMessage } from "./FileMessage";
+import { useDragAndDrop } from "@/hooks/useDragAndDrop";
+import { useToast } from "@/hooks/use-toast";
 
 interface ChatWindowProps {
   conversation: Conversation | null;
@@ -56,10 +59,41 @@ export const ChatWindow = ({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
   const [sending, setSending] = useState(false);
+  const [isUploadingDrop, setIsUploadingDrop] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
+  const { toast } = useToast();
   const { typingUsers, setTyping } = useTypingIndicator(conversation?.id || null);
+
+  const handleFileDrop = async (file: File) => {
+    if (!user || !conversation) return;
+    
+    setIsUploadingDrop(true);
+    try {
+      const result = await uploadFile(file, user.id, conversation.id);
+      await onSendMessage(`Shared a ${result.fileType}`, result.fileType, result.url, result.fileName);
+      toast({
+        title: "File uploaded",
+        description: `${result.fileName} shared successfully`,
+      });
+    } catch (error) {
+      console.error("Drop upload error:", error);
+      toast({
+        title: "Upload failed",
+        description: "Failed to upload file. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploadingDrop(false);
+    }
+  };
+
+  const { isDragging, dragError, dragProps, clearError } = useDragAndDrop({
+    onFileDrop: handleFileDrop,
+    acceptedTypes: ACCEPTED_MIME_TYPES,
+    maxFileSize: MAX_FILE_SIZE,
+  });
 
   useEffect(() => {
     // Scroll to bottom when messages change
@@ -157,7 +191,75 @@ export const ChatWindow = ({
   });
 
   return (
-    <div className="h-full flex flex-col bg-background">
+    <div 
+      className={cn(
+        "h-full flex flex-col bg-background relative",
+        isDragging && "ring-2 ring-primary ring-inset"
+      )}
+      {...dragProps}
+    >
+      {/* Drag Overlay */}
+      <AnimatePresence>
+        {isDragging && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-50 bg-background/90 backdrop-blur-sm flex items-center justify-center"
+          >
+            <div className="flex flex-col items-center gap-4 text-center">
+              <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+                <Upload className="w-10 h-10 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-lg font-medium">Drop file to share</h3>
+                <p className="text-sm text-muted-foreground">
+                  Images, audio files, and documents up to 50MB
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Upload Progress Overlay */}
+      <AnimatePresence>
+        {isUploadingDrop && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-50 bg-background/90 backdrop-blur-sm flex items-center justify-center"
+          >
+            <div className="flex flex-col items-center gap-4 text-center">
+              <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                >
+                  <Upload className="w-10 h-10 text-primary" />
+                </motion.div>
+              </div>
+              <div>
+                <h3 className="text-lg font-medium">Uploading file...</h3>
+                <p className="text-sm text-muted-foreground">Please wait</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Drag Error Toast */}
+      {dragError && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-destructive text-destructive-foreground px-4 py-2 rounded-md shadow-lg"
+          onClick={clearError}
+        >
+          {dragError}
+        </motion.div>
+      )}
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border bg-card">
         <div className="flex items-center gap-3">
