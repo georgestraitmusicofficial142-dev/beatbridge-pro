@@ -6,7 +6,6 @@ import {
   Video,
   Info,
   Send,
-  Paperclip,
   Smile,
   Edit2,
   Trash2,
@@ -33,12 +32,14 @@ import {
 import { Message, Conversation, useTypingIndicator } from "@/hooks/useChat";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
+import { FileUploadButton } from "./FileUploadButton";
+import { FileMessage } from "./FileMessage";
 
 interface ChatWindowProps {
   conversation: Conversation | null;
   messages: Message[];
   loading: boolean;
-  onSendMessage: (content: string) => Promise<any>;
+  onSendMessage: (content: string, messageType?: string, fileUrl?: string, fileName?: string) => Promise<any>;
   onEditMessage: (id: string, content: string) => Promise<void>;
   onDeleteMessage: (id: string) => Promise<void>;
 }
@@ -71,11 +72,15 @@ export const ChatWindow = ({
     if (!message.trim() || sending) return;
     
     setSending(true);
-    await onSendMessage(message);
+    await onSendMessage(message, "text");
     setMessage("");
     setSending(false);
     setTyping(false, user?.email || "User");
     inputRef.current?.focus();
+  };
+
+  const handleFileUploaded = async (fileUrl: string, fileName: string, fileType: string) => {
+    await onSendMessage(`Shared a ${fileType}`, fileType, fileUrl, fileName);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -297,7 +302,41 @@ export const ChatWindow = ({
                                 <X className="w-4 h-4" />
                               </Button>
                             </div>
+                          ) : msg.file_url && msg.message_type !== "text" ? (
+                            // File message
+                            <div className="relative group">
+                              <FileMessage
+                                fileUrl={msg.file_url}
+                                fileName={msg.file_name || "File"}
+                                fileType={msg.message_type}
+                                isOwn={isOwn}
+                              />
+                              {/* Message Actions for file messages */}
+                              {isOwn && (
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      size="icon"
+                                      variant="ghost"
+                                      className="absolute -left-10 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8"
+                                    >
+                                      <MoreVertical className="w-4 h-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem
+                                      className="text-destructive"
+                                      onClick={() => onDeleteMessage(msg.id)}
+                                    >
+                                      <Trash2 className="w-4 h-4 mr-2" />
+                                      Delete
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              )}
+                            </div>
                           ) : (
+                            // Text message
                             <div
                               className={cn(
                                 "px-4 py-2 rounded-2xl relative",
@@ -338,7 +377,7 @@ export const ChatWindow = ({
                                       className="text-destructive"
                                       onClick={() => onDeleteMessage(msg.id)}
                                     >
-                                      <Trash2 className="w-4 h-4 mr-2" />
+                                      <Trash2 className="w-4 h-4" />
                                       Delete
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
@@ -385,14 +424,11 @@ export const ChatWindow = ({
       {/* Input */}
       <div className="p-4 border-t border-border bg-card">
         <div className="flex items-center gap-2">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full shrink-0">
-                <Paperclip className="w-5 h-5" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Attach File</TooltipContent>
-          </Tooltip>
+          <FileUploadButton
+            conversationId={conversation.id}
+            onFileUploaded={handleFileUploaded}
+            disabled={sending}
+          />
           <Input
             ref={inputRef}
             value={message}
