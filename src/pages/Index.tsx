@@ -6,6 +6,7 @@ import { TrustedBySection } from "@/components/home/TrustedBySection";
 import { BookSessionCTA } from "@/components/home/BookSessionCTA";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { OutreachSection } from "@/components/home/OutreachSection";
+import { FAQSection } from "@/components/home/FAQSection";
 import { Footer } from "@/components/layout/Footer";
 import { PageMeta } from "@/components/seo/PageMeta";
 
@@ -26,6 +27,7 @@ const Index = () => {
         <OutreachSection />
         <BookSessionCTA />
         <TestimonialsSection />
+        <FAQSection />
       </main>
       <Footer />
     </div>

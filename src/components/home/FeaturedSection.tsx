@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { Play, Pause } from "lucide-react";
 import { useState } from "react";
 
@@ -108,16 +109,17 @@ export const FeaturedSection = () => {
               Featured <span className="gradient-text">Releases</span>
             </h2>
           </div>
-          <motion.a
-            href="#"
-            whileHover={{ x: 5 }}
-            className="mt-4 md:mt-0 text-sm font-medium text-primary flex items-center gap-2"
-          >
-            View All Releases
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </motion.a>
+          <Link to="/beats">
+            <motion.span
+              whileHover={{ x: 5 }}
+              className="mt-4 md:mt-0 text-sm font-medium text-primary flex items-center gap-2"
+            >
+              View All Releases
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </motion.span>
+          </Link>
         </motion.div>
 
         {/* Releases Grid */}
