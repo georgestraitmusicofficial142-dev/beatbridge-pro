@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { Calendar, Clock, Globe, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -67,13 +68,17 @@ export const BookSessionCTA = () => {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-4"
             >
-              <Button variant="accent" size="xl" className="group">
-                Book Your Session
-                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <Button variant="glass" size="xl">
-                View Pricing
-              </Button>
+              <Link to="/booking">
+                <Button variant="accent" size="xl" className="group">
+                  Book Your Session
+                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+              <Link to="/services">
+                <Button variant="glass" size="xl">
+                  View Pricing
+                </Button>
+              </Link>
             </motion.div>
           </motion.div>
         </div>

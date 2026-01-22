@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { Music, Headphones, Radio, Video, Mic2, Sliders } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Music, Headphones, Radio, Video, Mic2, Sliders, ArrowRight } from "lucide-react";
 
 const services = [
   {
@@ -95,38 +96,37 @@ export const ServicesSection = () => {
           className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
           {services.map((service, index) => (
-            <motion.div
-              key={service.title}
-              variants={itemVariants}
-              whileHover={{ y: -8, transition: { duration: 0.3 } }}
-              className="group relative p-8 rounded-2xl bg-card border border-border/50 hover:border-primary/30 transition-all duration-500"
-            >
-              {/* Hover Glow */}
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              
-              <div className="relative z-10">
-                {/* Icon */}
-                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${service.gradient} flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                  <service.icon className="w-7 h-7 text-primary-foreground" />
-                </div>
+            <Link key={service.title} to="/services">
+              <motion.div
+                variants={itemVariants}
+                whileHover={{ y: -8, transition: { duration: 0.3 } }}
+                className="group relative p-8 rounded-2xl bg-card border border-border/50 hover:border-primary/30 transition-all duration-500 h-full cursor-pointer"
+              >
+                {/* Hover Glow */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                
+                <div className="relative z-10">
+                  {/* Icon */}
+                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${service.gradient} flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                    <service.icon className="w-7 h-7 text-primary-foreground" />
+                  </div>
 
-                {/* Content */}
-                <h3 className="font-display text-xl font-semibold mb-3 text-foreground group-hover:text-primary transition-colors duration-300">
-                  {service.title}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {service.description}
-                </p>
+                  {/* Content */}
+                  <h3 className="font-display text-xl font-semibold mb-3 text-foreground group-hover:text-primary transition-colors duration-300">
+                    {service.title}
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {service.description}
+                  </p>
 
-                {/* Learn More Link */}
-                <div className="mt-6 flex items-center gap-2 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <span>Learn More</span>
-                  <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
+                  {/* Learn More Link */}
+                  <div className="mt-6 flex items-center gap-2 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <span>Learn More</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
+            </Link>
           ))}
         </motion.div>
       </div>
